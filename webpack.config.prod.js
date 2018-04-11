@@ -1,4 +1,4 @@
-const dev = require('./webpack.config.dev')
+const { serve, ...dev } = require('./webpack.config.dev')
 
 module.exports = {
   ...dev,

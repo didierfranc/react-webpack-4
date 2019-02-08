@@ -1,43 +1,42 @@
-// @flow
-import React, { Component, lazy, Suspense } from 'react'
+import React, {
+  lazy, Suspense, useReducer, createRef,
+} from 'react'
 import { hot } from 'react-hot-loader'
 
-const AsyncText = lazy(() => import('./Text'))
+import reducer from './store/reducer'
+import { ADD_TODO } from './store/actions'
 
-const letterToNumber = (text: string) => {
-  const n: number = text.toLowerCase().charCodeAt(0) - 96
-  return n > 26 || n < 1 ? 'This is not a letter' : n
-}
+const Todo = lazy(() => import('./Todo'))
 
-class App extends Component<{}, { text: string }> {
-  state = { text: '' }
+function App() {
+  const input = createRef()
+  const [state, dispatch] = useReducer(reducer, { todos: [] })
 
-  handleClick = () => {
-    this.setState({ text: this.input ? this.input.value : '' })
-  }
+  return (
+    <>
+      <input ref={input} />
+      <button
+        type="button"
+        onClick={() => {
+          dispatch({
+            type: ADD_TODO,
+            payload: {
+              text: input.current.value,
+            },
+          })
 
-  input: ?HTMLInputElement
-
-  render() {
-    const { text } = this.state
-
-    return (
-      <>
-        <input
-          ref={(el) => {
-            this.input = el
-          }}
-          maxLength={1}
-        />
-        <button type="button" onClick={this.handleClick}>
-          →
-        </button>
-        <Suspense fallback={<div>Loading...</div>}>
-          {text && <AsyncText>{letterToNumber(text)}</AsyncText>}
+          input.current.value = ''
+        }}
+      >
+        +
+      </button>
+      {state.todos.map(todo => (
+        <Suspense key={todo.id} fallback={<div>Loading...</div>}>
+          <Todo todo={todo} dispatch={dispatch} />
         </Suspense>
-      </>
-    )
-  }
+      ))}
+    </>
+  )
 }
 
 export default hot(module)(App)

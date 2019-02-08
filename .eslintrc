@@ -8,7 +8,6 @@
   "rules": {
     "semi": [1, "never"],
     "max-len": [1, 80],
-    "arrow-parens": [2, "as-needed"],
     "react/jsx-filename-extension": [
       1,
       {

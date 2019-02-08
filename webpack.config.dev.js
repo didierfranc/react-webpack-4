@@ -31,8 +31,9 @@ module.exports = {
     }),
   ],
   serve: {
+    port: 3000,
     content: [__dirname],
-    add: app => {
+    add: (app) => {
       app.use(convert(proxy('/api', { target: 'http://localhost:8081' })))
       app.use(convert(history()))
     },

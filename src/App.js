@@ -1,8 +1,8 @@
 // @flow
-import React, { Component, Fragment } from 'react'
+import React, { Component, lazy, Suspense } from 'react'
 import { hot } from 'react-hot-loader'
 
-import AsyncText from './Async'
+const AsyncText = lazy(() => import('./Text'))
 
 const letterToNumber = (text: string) => {
   const n: number = text.toLowerCase().charCodeAt(0) - 96
@@ -12,27 +12,30 @@ const letterToNumber = (text: string) => {
 class App extends Component<{}, { text: string }> {
   state = { text: '' }
 
-  input: ?HTMLInputElement
-
   handleClick = () => {
     this.setState({ text: this.input ? this.input.value : '' })
   }
+
+  input: ?HTMLInputElement
 
   render() {
     const { text } = this.state
 
     return (
-      // eslint does not support <></> yet 😿
-      <Fragment>
+      <>
         <input
-          ref={el => {
+          ref={(el) => {
             this.input = el
           }}
           maxLength={1}
         />
-        <button onClick={this.handleClick}>→</button>
-        {text && <AsyncText>{letterToNumber(text)}</AsyncText>}
-      </Fragment>
+        <button type="button" onClick={this.handleClick}>
+          →
+        </button>
+        <Suspense fallback={<div>Loading...</div>}>
+          {text && <AsyncText>{letterToNumber(text)}</AsyncText>}
+        </Suspense>
+      </>
     )
   }
 }
